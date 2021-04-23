@@ -38,8 +38,8 @@ func InitDB() {
 	// 设置连接的最大可复用时间
 	db.DB().SetConnMaxLifetime(10 * time.Second)
 
-	// GORM自动迁移模型
-	db.AutoMigrate(&User{}, &Article{}, &Category{})
 	// 禁用默认表名的复数形式
 	db.SingularTable(true)
+	// GORM自动迁移模型
+	db.AutoMigrate(&User{}, &Article{}, &Category{})
 }
