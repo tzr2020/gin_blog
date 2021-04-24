@@ -47,10 +47,29 @@ func GetUsers(c *gin.Context) {
 
 // 编辑用户
 func EditUser(c *gin.Context) {
-
+	id, _ := strconv.Atoi(c.Param("id"))
+	var data model.User
+	c.ShouldBindJSON(&data)
+	code = model.CheckUser(data.Username)
+	if code == errmsg.SUCCESS {
+		code = model.EditUser(id, &data)
+	} else {
+		c.Abort()
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"data":    data,
+		"message": errmsg.GetErrMsg(code),
+	})
 }
 
 // 删除用户
 func DeleteUser(c *gin.Context) {
-
+	id, _ := strconv.Atoi(c.Param("id"))
+	code = model.DeleteUser(id)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"data":    nil,
+		"message": errmsg.GetErrMsg(code),
+	})
 }

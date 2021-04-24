@@ -31,7 +31,7 @@ func CheckUser(name string) int {
 
 // 新增用户
 func CreateUser(data *User) int {
-	data.Password = ScryptPw(data.Password)
+	// data.Password = ScryptPw(data.Password)
 	err = db.Create(data).Error
 	if err != nil {
 		return errmsg.ERROR
@@ -49,9 +49,28 @@ func GetUSers(pageSize int, pageNum int) []User {
 	return users
 }
 
-// 更新用户
+// 更新用户信息，密码除外
+func EditUser(id int, data *User) int {
+	var user User
+	var m = make(map[string]interface{})
+	m["username"] = data.Username
+	m["role"] = data.Role
+	err = db.Model(&user).Where("id=?", id).Updates(m).Error
+	if err != nil {
+		return errmsg.ERROR
+	}
+	return errmsg.SUCCESS
+}
 
 // 删除用户
+func DeleteUser(id int) int {
+	var user User
+	err = db.Where("id=?", id).Delete(&user).Error
+	if err != nil {
+		return errmsg.ERROR
+	}
+	return errmsg.SUCCESS
+}
 
 // 密码加密
 func ScryptPw(password string) string {
@@ -65,4 +84,9 @@ func ScryptPw(password string) string {
 	}
 	finaPw := base64.StdEncoding.EncodeToString(hashPw)
 	return finaPw
+}
+
+// 钩子函数
+func (u *User) BeforeSave() {
+	u.Password = ScryptPw(u.Password)
 }
