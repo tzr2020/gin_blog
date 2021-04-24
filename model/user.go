@@ -90,3 +90,20 @@ func ScryptPw(password string) string {
 func (u *User) BeforeSave() {
 	u.Password = ScryptPw(u.Password)
 }
+
+// 登录验证
+func CheckLogin(username string, password string) int {
+	var user User
+	db.Where("username=?", username).First(&user)
+
+	if user.ID == 0 {
+		return errmsg.ERROR_USER_NOT_EXIST
+	}
+	if ScryptPw(password) != user.Password {
+		return errmsg.ERROR_PASSWORD_WRONG
+	}
+	if user.Role != 0 {
+		return errmsg.ERROR_USER_NO_RIGHT
+	}
+	return errmsg.SUCCESS
+}
