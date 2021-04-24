@@ -19,6 +19,10 @@ func InitRouter() *gin.Engine {
 		rgv1.DELETE("user/:id", v1.DeleteUser)
 
 		// 文章模块的路由接口
+		rgv1.POST("article/add", v1.AddArticle)
+		rgv1.GET("articles", v1.GetArticles)
+		rgv1.PUT("article/:id", v1.EditArticle)
+		rgv1.DELETE("article/:id", v1.DeleteArticle)
 
 		// 分类模块的路由接口
 		rgv1.POST("category/add", v1.AddCategory)
