@@ -6,7 +6,7 @@ import (
 )
 
 type Article struct {
-	Category Category
+	Category Category `gorm:"foreignkey:Cid"`
 	gorm.Model
 	Title   string `gorm:"type:varchar(100);not null" json:"title"`
 	Cid     int    `gorm:"type:int;not null" json:"cid"`
@@ -25,18 +25,34 @@ func CreateArticle(data *Article) int {
 }
 
 // 查询文章列表
-func GetArticles(pageSize int, pageNum int) []Article {
+func GetArticles(pageSize int, pageNum int) ([]Article, int) {
 	var as []Article
-	err = db.Limit(pageSize).Offset((pageNum - 1) * pageSize).Find(&as).Error
+	err = db.Preload("Category").Limit(pageSize).Offset((pageNum - 1) * pageSize).Find(&as).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil
+		return nil, errmsg.ERROR
 	}
-	return as
+	return as, errmsg.SUCCESS
 }
 
 // 查询某个分类的文章列表
+func GetArticlesByCategory(id int, pageSize int, pageNum int) ([]Article, int) {
+	var as []Article
+	err = db.Preload("Category").Limit(pageSize).Offset((pageNum-1)*pageSize).Where("Cid=?", id).Find(&as).Error
+	if err != nil {
+		return nil, errmsg.ERROR_CATE_NOT_EXIST
+	}
+	return as, errmsg.SUCCESS
+}
 
 // 查询单个文章
+func GetArticleInfo(id int) (Article, int) {
+	var a Article
+	err = db.Preload("Category").Where("id=?", id).First(&a).Error
+	if err != nil {
+		return a, errmsg.ERROR_ART_NOT_EXIST
+	}
+	return a, errmsg.SUCCESS
+}
 
 // 编辑文章
 func EditArticle(id int, data *Article) int {

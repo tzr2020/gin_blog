@@ -31,8 +31,37 @@ func GetArticles(c *gin.Context) {
 	if pageNum == 0 {
 		pageNum = -1
 	}
-	data := model.GetArticles(pageSize, pageNum)
-	code = errmsg.SUCCESS
+	data, code := model.GetArticles(pageSize, pageNum)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"data":    data,
+		"message": errmsg.GetErrMsg(code),
+	})
+}
+
+// 查询某个分类的文章列表
+func GetArticlesByCategory(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	pageSize, _ := strconv.Atoi(c.Query("pagesize"))
+	pageNum, _ := strconv.Atoi(c.Query("pagenum"))
+	if pageSize == 0 {
+		pageSize = -1
+	}
+	if pageNum == 0 {
+		pageNum = -1
+	}
+	data, code := model.GetArticlesByCategory(id, pageSize, pageNum)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"data":    data,
+		"message": errmsg.GetErrMsg(code),
+	})
+}
+
+// 查询单个文章
+func GetArticleInfo(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	data, code := model.GetArticleInfo(id)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  code,
 		"data":    data,

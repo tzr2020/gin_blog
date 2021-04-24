@@ -21,6 +21,8 @@ func InitRouter() *gin.Engine {
 		// 文章模块的路由接口
 		rgv1.POST("article/add", v1.AddArticle)
 		rgv1.GET("articles", v1.GetArticles)
+		rgv1.GET("articles/category/:id", v1.GetArticlesByCategory)
+		rgv1.GET("article/info/:id", v1.GetArticleInfo)
 		rgv1.PUT("article/:id", v1.EditArticle)
 		rgv1.DELETE("article/:id", v1.DeleteArticle)
 
