@@ -40,13 +40,15 @@ func CreateUser(data *User) int {
 }
 
 // 查询用户列表
-func GetUSers(pageSize int, pageNum int) []User {
+func GetUSers(pageSize int, pageNum int) ([]User, int) {
 	var users []User
+	var total int
 	err = db.Limit(pageSize).Offset((pageNum - 1) * pageSize).Find(&users).Error
+	err = db.Model(&users).Count(&total).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil
+		return nil, 0
 	}
-	return users
+	return users, total
 }
 
 // 更新用户信息，密码除外
