@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/tzr2020/gin_blog/model"
 	"github.com/tzr2020/gin_blog/utils/errmsg"
+	"github.com/tzr2020/gin_blog/utils/validator"
 )
 
 var code int
@@ -15,13 +16,24 @@ var code int
 func AddUser(c *gin.Context) {
 	var data model.User
 	c.ShouldBindJSON(&data)
+
+	var msg string
+	msg, code = validator.Validate(&data)
+	if code != errmsg.SUCCESS {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  code,
+			"message": msg,
+		})
+		return
+	}
+
 	code = model.CheckUser(data.Username)
 	if code == errmsg.SUCCESS {
 		code = model.CreateUser(&data)
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"status":  code,
-		"data":    data,
 		"message": errmsg.GetErrMsg(code),
 	})
 }
